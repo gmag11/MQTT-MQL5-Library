@@ -22,7 +22,7 @@ There is an example code inside [example](example/) folder
 
 ## Usage
 To use the MQTT client library, create an instance of the MQTTClient class and call its methods to connect to the broker, subscribe to topics, publish messages, and handle incoming messages.
-Check https://github.com/gmag11/MQTT-MQL5-Library/blob/master/example/mqttTest.mq5 for an example.
+Check [example/mqttTest.mq5](example/mqttTest.mq5) for an example.
 
 Contributing
 Contributions are welcome! If you would like to contribute to this project, please fork the repository, make your changes, and submit a pull request. Please make sure to follow the Contributing Guidelines when submitting your changes.
