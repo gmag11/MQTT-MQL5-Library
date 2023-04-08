@@ -42,9 +42,6 @@ void reconnect() {
       topic = baseTopic + "/start";
       printf("Publishing message: %s - %s", topic, payload);
       mqtt.publish(topic,payload,true);
-      //client.publish("outTopic","hello world");
-      // ... and resubscribe
-      //client.subscribe("inTopic");
     } else {
       printf("failed, rc=%d try again in 5 seconds", mqtt.state());
       // Wait 5 seconds before retrying
