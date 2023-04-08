@@ -151,7 +151,7 @@ private:
          numBytes = SocketRead(_clientSocket, localBuffer, 1, this.socketTimeout);
       }
       if (numBytes < 1){
-         printf("Error SocketRead. %d received bytes", numBytes);
+         printf("Error %s. %d received bytes", this._useTLS ? "SocketTlsRead":"SocketRead", numBytes);
          return false;
       }
       result = localBuffer[0];
@@ -170,7 +170,7 @@ private:
       return false;
    }
    
-   string printBuffer (uint8_t& buf[], uint len){
+   /*string printBuffer (uint8_t& buf[], uint len){
       string result = "";
       for (uint i = 0; i < len; i++) {
          if (buf[i] >= 32 && buf[i] <= 126) {
@@ -181,7 +181,7 @@ private:
          }
       }
       return result;
-   }
+   }*/
    
    uint16_t readPacket(uint8_t& lengthLength) {
       uint16_t len = 0;
@@ -290,7 +290,7 @@ private:
       
       ArrayCopy(sendBuffer,buf,0,MQTT_MAX_HEADER_SIZE-hlen,length+hlen);
       
-      printf("Header legth: %d Total Length: %d Buffer to send: %s", hlen, length+hlen, printBuffer(sendBuffer,length+hlen));
+      //printf("Header legth: %d Total Length: %d Buffer to send: %s", hlen, length+hlen, printBuffer(sendBuffer,length+hlen));
       
       bool rc = false;
       if (this._useTLS){
@@ -412,6 +412,7 @@ public:
          rc = SocketIsConnected(_clientSocket);
          if (!rc) {
             if (this._state == MQTT_CONNECTED) {
+               printf("Connected: Connection lost");
                this._state = MQTT_CONNECTION_LOST;
                //SocketClose(_clientSocket);
             }
@@ -502,7 +503,7 @@ public:
 #endif 
             ArrayCopy(this.buffer,d,length,0,MQTT_HEADER_VERSION_LENGTH);
             length += MQTT_HEADER_VERSION_LENGTH;
-            printf("----> HEADER: len: %d: buffer: %s", length, printBuffer(this.buffer,length));
+            //printf("----> HEADER: len: %d: buffer: %s", length, printBuffer(this.buffer,length));
             uint8_t v;
             if (willTopic.Length() > 0) {
                 v = 0x04|(willQos<<3)|(willRetain<<5);
@@ -543,7 +544,7 @@ public:
                 }
             }
             
-            printf("----> len: %d: buffer: %s", length, printBuffer(this.buffer,length));
+            //printf("----> len: %d: buffer: %s", length, printBuffer(this.buffer,length));
             
             if(!write(MQTTCONNECT,this.buffer,(uint16_t)(length-MQTT_MAX_HEADER_SIZE))) {
                printf("Error after connect");
@@ -734,7 +735,7 @@ public:
                //SocketClose(_clientSocket);
                 return false;
             } else {
-               printf("Ping request");
+               printf("Sent MQTTPINGREQ");
                this.buffer[0] = MQTTPINGREQ;
                this.buffer[1] = 0;
                if (this._useTLS) {
@@ -807,9 +808,11 @@ public:
                   printf("Received MQTTPINGRESP");
                   pingOutstanding = false;
                }
-            } else if (!connected()) {
-               // readPacket has closed the connection
-               return false;
+            } else {
+               if (!connected()) {
+                  printf("readPacket has closed the connection");
+                  return false;
+               }
             }
          }
          return true;
