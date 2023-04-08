@@ -25,18 +25,17 @@
 
 //+------------------------------------------------------------------+
 //|                                                 PubSubClient.mqh |
-//|                                 Copyright 2023, Nicholas O'Leary |
+//|                  Copyright 2023, Nicholas O'Leary, German Martin |
 //|                        https://github.com/knolleary/pubsubclient |
+//|                      https://github.com/gmag11/MQTT-MQL5-Library |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2023, Nicholas O'Leary"
-#property link      "https://github.com/knolleary/pubsubclient"
+#property copyright "Copyright 2023, Nicholas O'Leary, German Martin"
+#property link      "https://github.com/gmag11/MQTT-MQL5-Library"
 //+------------------------------------------------------------------+
 //| defines                                                          |
 //+------------------------------------------------------------------+
 #ifndef PubSubClient_h
 #define PubSubClient_h
-
-//#include <Strings\String.mqh>
 
 //#define MQTT_VERSION_3_1      3
 #define MQTT_VERSION_3_1_1    4
@@ -754,7 +753,7 @@ public:
             uint16_t msgId = 0;
             uint8_t payload[];
             int payloadIdx;
-            printf ("Found data. %d bytes", len);
+            //printf ("Found data. %d bytes", len);
             if (len > 0) {
                lastInActivity = t;
                uint8_t type = this.buffer[0]&0xF0;
