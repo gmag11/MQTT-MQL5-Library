@@ -27,13 +27,14 @@ void reconnect() {
     // Attempt to connect
     if (mqtt.connect("MQL5_Client",mqttuser,mqttpassword,useTLS)) {
       Print("connected");
-      // Once connected, publish an announcement...
+      // Subscribe to required topics
       string topic = baseTopic + "/in";
       if (mqtt.subscribe(topic)) {
          printf("Subscription to topic %s correct", topic);
       } else {
          printf("Subscription to topic %s not correct", topic);
       }
+      // Once connected, publish an announcement...
       time_t currentTime = TimeLocal();
       MqlDateTime dt;
       TimeToStruct(currentTime,dt);
@@ -63,16 +64,7 @@ void onreceive(string& topic, uint8_t& payload[], uint payloadLength) {
 //+------------------------------------------------------------------+
 int OnInit()
   {
-//--- create timer
-   /*socket = SocketCreate();
-   if (socket == INVALID_HANDLE) {
-      printf("Error creating socket: %d", GetLastError());
-      Sleep(5000);
-      return (INIT_FAILED);
-   } else {
-      printf("Socket created: %d", socket);
-   }*/
-   mqtt = new PubSubClient(broker, port/*, socket*/);
+   mqtt = new PubSubClient(broker, port);
    if (mqtt.state() == OBJECT_CREATION_ERROR) {
       Print("Mqtt object creation error");
       return (INIT_FAILED);
@@ -80,8 +72,6 @@ int OnInit()
    Print("MQTT object created");
    mqtt.setCallback(onreceive);
    EventSetMillisecondTimer(50);
-   
-//---
    return(INIT_SUCCEEDED);
   }
 //+------------------------------------------------------------------+
@@ -94,7 +84,6 @@ void OnDeinit(const int reason)
    if (mqtt.connected()) {
       mqtt.disconnect();
    }
-   //SocketClose(socket);
    Print("MQTT terminated");
    delete (mqtt);
    
@@ -113,7 +102,6 @@ void OnTick()
 time_t lastMessage = 0;
 
 void OnTimer() {
-   //printf("Socket is: %d", socket);
    if (!mqtt.connected()) {
       reconnect();
    } else {
