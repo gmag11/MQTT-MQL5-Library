@@ -135,9 +135,9 @@ private:
    
    // reads a byte into result
    boolean readByte(uint8_t& result) {
-      time_t previousTime = TimeCurrent();
+      time_t previousTime = TimeLocal();
       /*while(!SocketIsReadable(_clientSocket)) {
-         time_t currentTime = TimeCurrent();
+         time_t currentTime = TimeLocal();
          if(currentTime - previousTime >= ((int32_t) this.socketTimeout)){
             printf("Timeout on readByte");
             return false;
@@ -298,7 +298,7 @@ private:
       } else {
          rc = SocketSend(this._clientSocket, sendBuffer, length+hlen);
       }
-      lastOutActivity = TimeCurrent();
+      lastOutActivity = TimeLocal();
       return rc;
    }
 
@@ -551,9 +551,9 @@ public:
             
             printf("MQTT connect sent");
 
-            lastInActivity = lastOutActivity = TimeCurrent();
+            lastInActivity = lastOutActivity = TimeLocal();
             while (!SocketIsReadable(_clientSocket)) {
-                time_t t = TimeCurrent();
+                time_t t = TimeLocal();
                 if ((t-lastInActivity) >= ((int32_t) this.socketTimeout)) {
                     _state = MQTT_CONNECTION_TIMEOUT;
                     //SocketClose(_clientSocket);
@@ -566,7 +566,7 @@ public:
             uint32_t len = readPacket(llen);
             if (len == 4) {
                 if (buffer[3] == 0) {
-                    lastInActivity = TimeCurrent();
+                    lastInActivity = TimeLocal();
                     pingOutstanding = false;
                     _state = MQTT_CONNECTED;
                     printf("MQTT connect confirmed");
@@ -713,7 +713,7 @@ public:
       _state = MQTT_DISCONNECTED;
       //_client->flush();
       SocketClose(_clientSocket);
-      lastInActivity = lastOutActivity = TimeCurrent();
+      lastInActivity = lastOutActivity = TimeLocal();
    }
    
    int state() {
@@ -726,7 +726,7 @@ public:
    
    boolean loop() {
       if (connected()) {
-         time_t t = TimeCurrent();
+         time_t t = TimeLocal();
          if ((t - lastInActivity > this.keepAlive) || (t - lastOutActivity > this.keepAlive)) {
             if (pingOutstanding) {
                printf("Timeout error: lastIN %ds lastOUT %ds", t - lastInActivity, t - lastOutActivity);
